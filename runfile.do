@@ -6,7 +6,8 @@
     sysdir set PERSONAL "${git}/"
 
   ssc install geoinpoly
-  
+  ssc install cdfplot
+
   net from "https://github.com/bbdaniels/stata/raw/main/"
 
   copy "https://github.com/graykimbrough/uncluttered-stata-graphs/raw/master/schemes/scheme-uncluttered.scheme" ///
