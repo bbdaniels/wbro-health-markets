@@ -1,10 +1,12 @@
 // Set global path locations
 
-  global box ""
-  global git ""
+  global box "/Users/bbdaniels/Library/CloudStorage/Box-Box/_Papers/WBRO Health Markets"
+  global git "/Users/bbdaniels/GitHub/wbro-health-markets"
     sysdir set PLUS "${git}/ado/"
     sysdir set PERSONAL "${git}/"
 
+  ssc install geoinpoly
+  
   net from "https://github.com/bbdaniels/stata/raw/main/"
 
   copy "https://github.com/graykimbrough/uncluttered-stata-graphs/raw/master/schemes/scheme-uncluttered.scheme" ///
