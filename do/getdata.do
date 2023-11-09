@@ -1,6 +1,6 @@
 
 // Get primary data for this project
-
+clear all
 // Kenya
 
   // Facilities in markets
