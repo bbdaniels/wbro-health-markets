@@ -50,4 +50,27 @@
     graph export "${git}/outputs/kenya-locations-markets.png" , replace
 
 
-//
+// Figure 3 (map): Most of the population has access to (i.e. resides in locations with) competitive markets 
+    // Map population density by location (colors) with 
+	
+  use "${git}/constructed/kenya-locations-markets.dta" , clear // 4532 observations left
+  
+   // Keep only the largest market within each location 
+    gsort _ID -market_n
+      bys _ID : gen temp = _n
+      keep if temp == 1
+      drop temp
+    replace market_n = 0 if missing(market_n) // Locations with 0 markets in them; 2433 locations remaining 
+
+      replace market_n = 10 if market_n > 10 // Cap markets with more than 10 facilities to 10 for subsequent visualization 
+	  
+	  *Create map using county shp
+label define market_n 0 "0 facilities" 1 "1 facility" 2 "2 facilities" 3 "3 facilities" 4 "4 facilites" 5 "5 facilities" 6 "6 facilities" 7 "7 facilities" 8 "8 facilities" 9 "9 facilities" 10 "10+ facilities" 
+label values market_n market_n market_n market_n market_n market_n market_n market_n market_n market_n
+	
+spmap market_n using "${git}/data/kenya-locations-shp.dta", clmethod(unique) ndlabel("no values") id(_ID) fcolor(Blues2) ///
+polygon(data("${git}/data/kenya-county-shp.dta")) ///
+title("Largest Available Market with X Total Facilities", c(black) span)
+		
+		graph export "${git}/outputs/kenya_map_largest-market-size.png", replace width(5000)
+
