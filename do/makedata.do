@@ -41,4 +41,10 @@ use "${git}/data/kenya-facilities-markets.dta" , clear
 
   save "${git}/constructed/kenya-locations-markets.dta" , replace
 
-//
+
+  
+  
+  
+// Fact #2
+use "${git}/data/SP_summary.dta" , clear
+  save "${git}/constructed/SP_summary.dta" , replace

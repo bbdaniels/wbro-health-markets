@@ -1,7 +1,7 @@
-
 // Get primary data for this project
 clear all
-// Kenya
+
+// Fact 1: Kenya
 
   // Facilities in markets
   use "${box}/data/Kenya/Constructed/Facilities.dta" , clear
@@ -20,3 +20,11 @@ clear all
   use "${box}/data/Kenya/Data/GIS/Kenya_County_shp.dta" , clear 
 	save "${git}/data/kenya-county-shp.dta", replace
 // End
+
+
+// Fact 2: Standardized Patient lit review 
+clear all 
+import excel using "${box}/data/SP_Summary.xlsx", firstrow sheet("For plotting")
+save "${git}/data/SP_summary.dta", replace
+
+

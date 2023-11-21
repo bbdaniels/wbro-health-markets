@@ -1,4 +1,4 @@
-//
+// Fact #1: Kenya  
 
 // Figure 1 -- "most health facilities are in competitive markets"
 
@@ -73,4 +73,20 @@ polygon(data("${git}/data/kenya-county-shp.dta")) ///
 title("Largest Available Market with X Total Facilities", c(black) span)
 		
 		graph export "${git}/outputs/kenya_map_largest-market-size.png", replace width(5000)
+
+
+			
+	
+
+// Fact #2: Quality of Care is Poor 
+use "${git}/constructed/SP_summary.dta" , clear 
+
+graph hbar CorrectCaseManagement, over(PaperDisease) ///
+    ytitle("Proportion Receiving Correct Case Management (%)") ///
+    title("Proportion of SP's Receiving Correct Case Management in SP Studies") ///
+    ylabel(0 20 40 60 80 100) ///
+    bar(1, color(red))  // You can customize the color if needed
+
+graph export "${git}/outputs/SP_summary.png" , replace width(1800) height(600)
+
 
