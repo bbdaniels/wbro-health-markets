@@ -1,14 +1,14 @@
 // Set global path locations
 if c(username)=="bbdaniels" {
-	global box "/Users/bbdaniels/Library/CloudStorage/Box-Box/_Papers/WBRO Health Markets" 
+	global box "/Users/bbdaniels/Library/CloudStorage/Box-Box/_Papers/WBRO Health Markets"
 	global git "/Users/bbdaniels/GitHub/wbro-health-markets"
-  } 
+  }
 else if c(username)=="kevin" {
 	global box "C:/Users/kevin/Box/WBRO Health Markets"
 	global git "C:/Users/kevin/Github/wbro-health-markets"
-  } 
-  
-  
+  }
+
+
     sysdir set PLUS "${git}/ado/"
     sysdir set PERSONAL "${git}/"
 
