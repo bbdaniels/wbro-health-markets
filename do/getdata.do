@@ -19,8 +19,17 @@ clear all
 
   use "${box}/data/Kenya/Data/GIS/Kenya_County_shp.dta" , clear
 	save "${git}/data/kenya-county-shp.dta", replace
-// End
 
+  /* Facilities in markets (Kepsie)
+  use "${box}/data/Kenya/data/raw/kepsie-facilities.dta" , clear
+  isid hfid_m , sort
+  set seed 12345
+  zcenter , id(hfid_m) x(longitude) y(latitude) maxdistance(4) gen(market) latlon
+  geoinpoly latitude longitude using "${git}/constructed/kenya-locations-shp.dta" // Map geographic locations (facilities) to shapefile polygons (locations
+    lab var _ID "SHP ID for Location" // No missing values for ID; i.e. all facilities were matched with a location polygen from the shp
+
+  save "${git}/data/kenya-facilities-kepsie.dta" , replace
+  */
 
 // Fact 2: Standardized Patient lit review
 clear all
