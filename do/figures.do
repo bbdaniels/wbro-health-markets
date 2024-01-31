@@ -1,6 +1,6 @@
 // Fact #1: Kenya
 
-// Figure 1 -- "most health facilities are in competitive markets"
+// Fact 1 -- "most health care is in competitive markets"
 
   use "${git}/constructed/kenya-facilities-markets.dta" , clear
 
@@ -15,10 +15,7 @@
       xlab(1 2 3 4 5 6 7 8 9 10 "10+" , notick) xtit("...X Total Health Facilities") ///
       ytit("Percentage of Markets/Facilities Facing...") yscale(noline) ylab(0 "0%" .25 "25%" .5 "50%" , notick) yline(.25 .5 , lc(black))
 
-    graph export "${git}/outputs/kenya-facilities-markets.png" , replace
-
-
-// Figure 2 -- "most people are served by competitive markets"
+    graph export "${box}/outputs/kenya-facilities-markets.png" , replace
 
   use "${git}/constructed/kenya-locations-markets.dta" , clear
 
@@ -31,7 +28,7 @@
       xlab(0 1 2 3 4 5 6 7 8 9 10 "10+" , notick) xtit("...A Largest Available Market with X Total Health Facilities") ///
       ytit("Percentage of Locations/Population Facing...") yscale(noline) ylab(0 "0%" .25 "25%" .5 "50%" , notick) yline(.25 .5 , lc(black))
 
-    graph export "${git}/outputs/kenya-locations-markets.png" , replace
+    graph export "${box}/outputs/kenya-locations-markets.png" , replace
 
   use  "${git}/data/kenya-facilities-comparison.dta", clear
 
@@ -44,31 +41,81 @@
       xlab(0 1 2 3 4 5 6 7 8 9 10 "10+" , notick) xtit("...A Largest Available Market with X Total Health Facilities") ///
       ytit("Percentage of Population Facing...") yscale(noline) ylab(0 "0%" .25 "25%" .5 "50%" , notick) yline(.25 .5 , lc(black))
 
-    graph export "${git}/outputs/kenya-locations-markets-kepsie.png" , replace
+    graph export "${box}/outputs/kenya-locations-markets-kepsie.png" , replace
 
 
-// Figure 3 (map): Most of the population has access to (i.e. resides in locations with) competitive markets
-    // Map population density by location (colors) with
+// Fact 3: Qualifications and Quality
 
-  use "${git}/constructed/kenya-locations-markets.dta" , clear // 4532 observations left
+  use "${git}/constructed/sdi-irt.dta" , clear
 
-	  *Create map using county shp
-    label define market_n 0 "0 facilities" 1 "1 facility" 2 "2 facilities" 3 "3 facilities" 4 "4 facilites" 5 "5 facilities" 6 "6 facilities" 7 "7 facilities" 8 "8 facilities" 9 "9 facilities" 10 "10+ facilities"
-    label values market_n market_n
+  replace t_hat = 0 if t_hat < 0
 
-    spmap market_n using "${git}/data/kenya-locations-shp.dta", clmethod(unique) ndlabel("no values") id(_ID) fcolor(Blues2) ///
-    polygon(data("${git}/data/kenya-county-shp.dta")) ///
-    title("Largest Available Market with X Total Facilities", c(black) span)
+  graph hbox t_hat [pweight = weight], over(c , sort(1) descending) noout ///
+    box(1 , lc(gray) fc(none)) note(" ") ytit("Expected Correct Treatment Frequency") ///
+    ylab(0 "0%" 25 "25%" 50 "50%" 75 "75%" 100 "100%") medline(lc(black) lw(thick)) medtype(cline)
 
-		graph export "${git}/outputs/kenya_map_largest-market-size.png", replace width(5000)
+  graph export "${box}/outputs/sdi-qualifications.png" , replace
 
-// Fact #2: Quality of Care is Poor
-use "${git}/constructed/SP_summary.dta" , clear
+// Fact 5
 
-graph hbar CorrectCaseManagement, over(PaperDisease) ///
-    ytitle("Proportion Receiving Correct Case Management (%)") ///
-    title("Proportion of SP's Receiving Correct Case Management in SP Studies") ///
-    ylabel(0 20 40 60 80 100) ///
-    bar(1, color(red))  // You can customize the color if needed
+  use "${git}/constructed/sp-med.dta" , clear
 
-graph export "${git}/outputs/SP_summary.png" , replace width(1800) height(600)
+  replace med_antibiotic = med_antibiotic * 100
+  replace med_unlabelled = med_unlabelled * 100
+
+    graph hbar med_antibiotic med_unlabelled ///
+      , over(f) nofill ///
+        legend(on order(1 "Antibiotics" 2 "Unlabelled")) ///
+        ylab(0 "0%" 25 "25%" 50 "50%" 75 "75%" 100 "100%") ///
+        bargap(10) bar(1, fc(black)) bar(2, fc(maroon)) ///
+        blab(bar) ysize(6) scale(0.6)
+
+      local nb=`.Graph.plotregion1.barlabels.arrnels'
+      forval i=1/`nb' {
+      .Graph.plotregion1.barlabels[`i'].text[1] = "`: di %2.0f `.Graph.plotregion1.barlabels[`i'].text[1]''"
+      .Graph.plotregion1.barlabels[`i'].text[1]="`.Graph.plotregion1.barlabels[`i'].text[1]'%"
+      }
+      .Graph.drawgraph
+
+    graph export "${box}/outputs/sps-meds.png" , replace
+
+// Fact 7: Caseloads
+
+  use "${git}/constructed/sdi-cap.dta" , clear
+    gen pro = hf_outpatient / (60 * hf_staff_op)
+    gen fac = hf_outpatient / 60
+    gen op = hf_staff_op
+    replace op = 6 if op > 5
+      drop if op == 0
+
+      lab def op  6 "6+"
+      lab val op op
+
+    bys country : gen weight = 1/_N
+
+    graph box pro [pweight=weight], ///
+      over(public) over(op)  noout asy ///
+      legend(on pos(12) ring(0)) medline(lc(black) lw(thick)) medtype(cline)   ///
+      box(1, fc(none) lc(gray)) box(2, fc(none) lc(gs12)) ///
+      ytit("Patients per Provider Day") note("Providers at Clinic {&rarr}")
+
+      graph export "${box}/outputs/sdi-caseloads.png" , replace
+
+// Facct 8: public sector
+
+use "${git}/constructed/sdi-irt.dta" , clear
+
+  replace t_hat = 0 if t_hat < 0
+
+  drop if country == "Guinea Bissau"
+
+  graph hbox t_hat ///
+    , over(public) over(facility_level) over(country , sort(2) descending) ///
+      box(1, fc(none) lc(gray)) box(2, fc(none) lc(gs12)) ///
+      note(" ") ytit("Expected Correct Treatment Frequency") ///
+      noout scale(0.5) ylab(0 "0%" 25 "25%" 50 "50%" 75 "75%" 100 "100%") ///
+      legend(on pos(11) ring(0) c(1)) medline(lc(black) lw(thick)) medtype(cline)
+
+      graph export "${box}/outputs/sdi-pubpri.png" , replace
+
+// End

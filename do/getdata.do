@@ -1,7 +1,7 @@
 // Get primary data for this project
 clear all
 
-// Fact 1: Kenya
+// Fact 1: Facilities and markets competition
 
   // Facilities in markets
   use "${box}/data/Kenya/Constructed/Facilities.dta" , clear
@@ -35,5 +35,26 @@ clear all
 clear all
 import excel using "${box}/data/SP_Summary.xlsx", firstrow sheet("For plotting")
 save "${git}/data/SP_summary.dta", replace
+
+// Fact 3: Qualifications and quality
+
+  use "${box}/data/SDI/knowledge.dta" , clear
+
+  save "${git}/data/sdi-irt.dta", replace
+
+// Fact 5: Antibiotics
+
+  use "${box}/data/SPs/SP Interactions.dta"
+    keep facility_type study case uniqueid
+  save "${git}/data/sp-all.dta", replace
+
+  use "${box}/data/SPs/SP Medications.dta"
+  save "${git}/data/sp-med.dta", replace
+
+// Fact 7: Caseloads
+
+  use "${box}/data/SDI/capacity.dta" , clear
+
+  save "${git}/data/sdi-cap.dta", replace
 
 // End

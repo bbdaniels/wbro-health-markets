@@ -84,4 +84,46 @@ use "${git}/data/kenya-facilities-markets.dta" , clear
 use "${git}/data/SP_summary.dta" , clear
   save "${git}/constructed/SP_summary.dta" , replace
 
+// Fact 3
+
+use "${git}/data/sdi-irt.dta" , clear
+
+  egen t = rowmean(treat?)
+  reg t theta_mle i.countrycode
+  predict t_hat
+
+  egen c = group(provider_cadre1 provider_educ1) , label
+
+save "${git}/constructed/sdi-irt.dta" , replace
+
+// Fact 5
+
+  use "${git}/data/sp-med.dta" , clear
+    gen med_antibiotic = med_type == 6
+    gen med_unlabelled = med_type == 18 | med_type == 19
+    collapse (max) med_antibiotic med_unlabelled , by(study case uniqueid)
+    merge 1:1 study case uniqueid using "${git}/data/sp-all.dta"
+      replace med_antibiotic = 0 if med_antibiotic == .
+      replace med_unlabelled = 0 if med_unlabelled == .
+
+    replace facility_type = "Delhi Formal" if study == "Qutub Pilot" & facility_type == "MBBS"
+    replace facility_type = "Delhi Informal" if study == "Qutub Pilot" & facility_type == "Non-MBBS"
+    replace study = "Urban" if study == "Qutub Pilot" | study == "Qutub"
+    replace facility_type = "Village Informal" if facility_type == "Rural"
+    replace study = "Rural" if study == "Birbhum Control" | study == "Birbhum Treatment"
+    replace study = "Rural" if study == "Maqari"
+    drop if study == "China" | study == "Kenya"
+
+    replace facility_type = study + " " + facility_type if study == "Rural"
+
+    encode study, gen(s)
+    encode facility_type, gen(f)
+
+  save "${git}/constructed/sp-med.dta" , replace
+
+// Fact 7
+
+  use "${git}/data/sdi-cap.dta", clear
+  save "${git}/constructed/sdi-cap.dta", replace
+
 // End
