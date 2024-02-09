@@ -56,7 +56,48 @@
 
   graph export "${box}/outputs/sdi-qualifications.png" , replace
 
+// Fact 3
+
+  use "${git}/constructed/irving.dta" , clear
+  append using "${git}/constructed/sps.dta"
+
+  graph hbar duration ///
+  , over(country, sort(1))  over(method) nofill scale(0.7) ///
+    note("INRUD = International Network for the Rational Use of Drugs") ///
+    ytit("") ylab(0 "Consultation Duration {&rarr}" 5 "Five Minutes" 10 "Ten Minutes") ///
+    xoverhang blab(bar) bar(1,fc(black))
+
+
+  local nb=`.Graph.plotregion1.barlabels.arrnels'
+      forval i=1/`nb' {
+      .Graph.plotregion1.barlabels[`i'].text[1] = "`: di %2.1f `.Graph.plotregion1.barlabels[`i'].text[1]''"
+      .Graph.plotregion1.barlabels[`i'].text[1]="`.Graph.plotregion1.barlabels[`i'].text[1]' min"
+      }
+      .Graph.drawgraph
+
+      graph export "${box}/outputs/duration.png" , replace
+
+
 // Fact 5
+
+  use "${git}/constructed/antibiotics.dta" , clear
+
+    replace Prevalence = Prevalence * 100
+    graph hbar Prevalence ///
+    , over(Country , sort(1)) over(Denominator) nofill ///
+      ylab(0 "0%" 25 "25%" 50 "50%" 75 "75%" 100 "100%") ///
+      bar(1, fc(black)) ytit("Share of Antibiotics") ///
+      blab(bar) ysize(6) scale(0.7)
+
+      local nb=`.Graph.plotregion1.barlabels.arrnels'
+      forval i=1/`nb' {
+      .Graph.plotregion1.barlabels[`i'].text[1] = "`: di %2.0f `.Graph.plotregion1.barlabels[`i'].text[1]''"
+      .Graph.plotregion1.barlabels[`i'].text[1]="`.Graph.plotregion1.barlabels[`i'].text[1]'%"
+      }
+      .Graph.drawgraph
+
+      graph export "${box}/outputs/antibiotics.png" , replace
+
 
   use "${git}/constructed/sp-med.dta" , clear
 
@@ -80,6 +121,47 @@
     graph export "${box}/outputs/sps-meds.png" , replace
 
 // Fact 7: Caseloads
+
+  use "${git}/constructed/po-vietnam.dta" , clear
+
+    tw (scatter po_timeperpatient n , m(Oh) mlc(black) mfc(none) mlw(thin)) ///
+       (function 60/x , range(2.5 100) lc(gs14)) ///
+       (function 120/x , range(5 100) lc(gs10)) ///
+       (function 240/x , range(10 100) lc(gs6)) ///
+       (function 480/x , range(20 100) lc(gs2)) ///
+     , yscale(log) xscale(log) title("Working Days in Vietnam") ///
+      ylab(5 "5 Minutes" 15 "15 Minutes" 45 `""45 Minutes" "Per Patient""') ///
+      xlab(1 "One Patient Per Day" 10 "Ten Patients" 100 "100 Patients") ///
+      legend(on order(0 "Total:" 2 "One Hour" 3 "Two Hours" 4 "Four Hours" 5 "Eight Hours") ///
+            symxsize(small) size(small) r(1) ring(0) pos(11))
+
+      graph export "${box}/outputs/vietnam-times.png" , replace
+
+  use "${git}/constructed/sp-all.dta" , clear
+
+    replace patients_arrive = 5 if patients_arrive > 5 & patients_arrive != .
+    replace study = "Urban India" if strpos(study,"Qutub")
+    replace study = "Rural India" if strpos(study,"Maqari")
+
+    lab def p 0 "No Queue" 5 "Queue 5+"
+    lab val patients_arrive p
+
+    bys study: gen w = 100/_N
+    graph hbar (sum) w ///
+    , over(patients_arrive) over(study) ///
+      ylab(0 "0%" 25 "25%" 50 "50%" 75 "75%" 100 "100%") ///
+      xoverhang blab(bar) bar(1,fc(black)) ytit("") title("Patients in Queue when SP Arrives")
+
+
+    local nb=`.Graph.plotregion1.barlabels.arrnels'
+    forval i=1/`nb' {
+    .Graph.plotregion1.barlabels[`i'].text[1] = "`: di %2.0f `.Graph.plotregion1.barlabels[`i'].text[1]''"
+    .Graph.plotregion1.barlabels[`i'].text[1]="`.Graph.plotregion1.barlabels[`i'].text[1]'%"
+    }
+    .Graph.drawgraph
+
+    graph export "${box}/outputs/sp-queue.png" , replace
+
 
   use "${git}/constructed/sdi-cap.dta" , clear
     gen pro = hf_outpatient / (60 * hf_staff_op)

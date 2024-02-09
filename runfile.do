@@ -18,8 +18,9 @@ if c(username)=="bbdaniels" {
 	qui do "https://raw.githubusercontent.com/bbdaniels/stata/main/src/devkit/zcenter.ado"
 
   copy "https://github.com/graykimbrough/uncluttered-stata-graphs/raw/master/schemes/scheme-uncluttered.scheme" ///
-    "${git}/scheme-uncluttered.scheme" , replace
+    "${git}/ado/scheme-uncluttered.scheme" , replace
 
+  cd "${git}"
   set scheme uncluttered , perm
   graph set eps fontface "Helvetica"
 

@@ -31,27 +31,47 @@ clear all
   save "${git}/data/kenya-facilities-kepsie.dta" , replace
   */
 
-// Fact 2: Standardized Patient lit review
+// Fact X: Standardized Patient lit review
 clear all
 import excel using "${box}/data/SP_Summary.xlsx", firstrow sheet("For plotting")
 save "${git}/data/SP_summary.dta", replace
 
-// Fact 3: Qualifications and quality
+// Fact 2: Qualifications and quality
 
   use "${box}/data/SDI/knowledge.dta" , clear
 
   save "${git}/data/sdi-irt.dta", replace
 
+// Fact 3: Interaction Durations
+
+  import excel "${box}/Irving.xlsx" , clear first
+  save "${git}/data/irving.dta" , replace
+
+  import excel "${box}/Facts.xlsx" , clear first
+  save "${git}/data/sps.dta" , replace
+
 // Fact 5: Antibiotics
 
+  import excel "${box}/Sulis.xlsx" , clear first
+    save "${git}/data/antibiotics.dta" , replace
+
   use "${box}/data/SPs/SP Interactions.dta"
-    keep facility_type study case uniqueid
+    keep facility_type study case uniqueid patients_arrive
   save "${git}/data/sp-all.dta", replace
 
   use "${box}/data/SPs/SP Medications.dta"
   save "${git}/data/sp-med.dta", replace
 
 // Fact 7: Caseloads
+
+  use "${box}/data/PO/birbhum-po.dta" , clear
+    save "${git}/data/birbhum-po.dta" , replace
+
+  use "${box}/data/PO/vietnam-po.dta" , clear
+    save "${git}/data/vietnam-po.dta" , replace
+
+  use "${box}/data/PO/rhcp-po.dta" , clear
+      save "${git}/data/rhcp-po.dta" , replace
 
   use "${box}/data/SDI/capacity.dta" , clear
 

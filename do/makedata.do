@@ -96,7 +96,31 @@ use "${git}/data/sdi-irt.dta" , clear
 
 save "${git}/constructed/sdi-irt.dta" , replace
 
+// Fact 3
+
+  use "${git}/data/irving.dta" , clear
+    forv i = 0/9 {
+      replace Country = subinstr(Country,"`i'","",.)
+    }
+    ren Country country
+    ren Methodofassessingconsultation method
+    ren Meandurationmin duration
+      destring duration, force replace
+      keep if Include == 1
+    save "${git}/constructed/irving.dta" , replace
+
+  use "${git}/data/sps.dta" , clear
+    ren Duration duration
+    ren Method method
+    ren Country country
+    save "${git}/constructed/sps.dta" , replace
+
+
 // Fact 5
+
+
+  use "${git}/data/antibiotics.dta" , clear
+    save "${git}/constructed/antibiotics.dta" , replace
 
   use "${git}/data/sp-med.dta" , clear
     gen med_antibiotic = med_type == 6
@@ -122,6 +146,17 @@ save "${git}/constructed/sdi-irt.dta" , replace
   save "${git}/constructed/sp-med.dta" , replace
 
 // Fact 7
+
+  use "${git}/data/sp-all.dta", clear
+    save "${git}/constructed/sp-all.dta", replace
+
+  use "${git}/data/vietnam-po.dta" , clear
+    bys FACILITY_ID DOCTOR_ID : gen n = _N
+    duplicates drop FACILITY_ID DOCTOR_ID , force
+
+    save "${git}/constructed/po-vietnam.dta" , replace
+
+
 
   use "${git}/data/sdi-cap.dta", clear
   save "${git}/constructed/sdi-cap.dta", replace
