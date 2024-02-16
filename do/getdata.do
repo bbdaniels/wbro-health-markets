@@ -50,6 +50,9 @@ save "${git}/data/SP_summary.dta", replace
   import excel "${box}/Facts.xlsx" , clear first
   save "${git}/data/sps.dta" , replace
 
+  import excel "${box}/know-do.xlsx" , clear first
+  save "${git}/data/know-do.dta" , replace
+
 // Fact 5: Antibiotics
 
   import excel "${box}/Sulis.xlsx" , clear first

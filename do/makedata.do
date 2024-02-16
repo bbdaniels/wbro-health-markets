@@ -86,6 +86,12 @@ use "${git}/data/SP_summary.dta" , clear
 
 // Fact 3
 
+use "${git}/data/know-do.dta" , clear
+  replace Vignettes = 100 * Vignettes
+  replace SPs = 100 * SPs
+
+  save "${git}/constructed/know-do.dta" , replace
+
 use "${git}/data/sdi-irt.dta" , clear
 
   egen t = rowmean(treat?)

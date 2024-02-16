@@ -44,7 +44,7 @@
     graph export "${box}/outputs/kenya-locations-markets-kepsie.png" , replace
 
 
-// Fact 3: Qualifications and Quality
+// Fact 2: Qualifications and Quality
 
   use "${git}/constructed/sdi-irt.dta" , clear
 
@@ -57,6 +57,24 @@
   graph export "${box}/outputs/sdi-qualifications.png" , replace
 
 // Fact 3
+
+  use "${git}/constructed/know-do.dta" , clear
+
+  gen check = `"""' + Location + `""""' + Citation + `"""'
+
+  graph hbar Vignettes SPs, over(Condition) over(check) nofill ///
+    legend(on order(1 "Vignette Knowledge" 2 "SP Performance") c(1) pos(1) ring(1)) ///
+    bargap(10) bar(1, fc(black)) bar(2, fc(maroon)) ///
+    blab(bar) ylab(0 "0%" 25 "25%" 50 "50%" 75 "75%" 100 "100%") ysize(6) scale(0.6)
+
+    local nb=`.Graph.plotregion1.barlabels.arrnels'
+        forval i=1/`nb' {
+        .Graph.plotregion1.barlabels[`i'].text[1] = "`: di %2.0f `.Graph.plotregion1.barlabels[`i'].text[1]''"
+        .Graph.plotregion1.barlabels[`i'].text[1]="`.Graph.plotregion1.barlabels[`i'].text[1]'%"
+        }
+        .Graph.drawgraph
+
+        graph export "${box}/outputs/knowdo.png" , replace
 
   use "${git}/constructed/irving.dta" , clear
   append using "${git}/constructed/sps.dta"
@@ -77,6 +95,26 @@
 
       graph export "${box}/outputs/duration.png" , replace
 
+// Fact 4
+
+  use "${git}/constructed/sps.dta" , clear
+  replace Correct = 100 * Correct
+  replace Antibiotics = 100 * Antibiotics
+  gen check = country + `": "' + Study
+
+  graph hbar Correct Antibiotics, over(check, sort(1)) over(Condition) nofill ///
+    legend(on order(1 "Correct Management" 2 "Unnecessary Antibiotics") c(1) pos(1) ring(1)) ///
+    bargap(10) bar(1, fc(black)) bar(2, fc(maroon)) ///
+    blab(bar) ylab(0 "0%" 25 "25%" 50 "50%" 75 "75%" 100 "100%") ysize(6) scale(0.5)
+
+    local nb=`.Graph.plotregion1.barlabels.arrnels'
+        forval i=1/`nb' {
+        .Graph.plotregion1.barlabels[`i'].text[1] = "`: di %2.0f `.Graph.plotregion1.barlabels[`i'].text[1]''"
+        .Graph.plotregion1.barlabels[`i'].text[1]="`.Graph.plotregion1.barlabels[`i'].text[1]'%"
+        }
+        .Graph.drawgraph
+
+        graph export "${box}/outputs/antibiotics.png" , replace
 
 // Fact 5
 
@@ -172,6 +210,8 @@
 
       lab def op  6 "6+"
       lab val op op
+
+      duplicates drop country hf_id , force
 
     bys country : gen weight = 1/_N
 
