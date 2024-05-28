@@ -1,15 +1,26 @@
 // Set global path locations
+if c(username)=="bbdaniels" {
+	global box "/Users/bbdaniels/Library/CloudStorage/Box-Box/_Papers/WBRO Health Markets"
+	global git "/Users/bbdaniels/GitHub/wbro-health-markets"
+  }
 
-  global box ""
-  global git ""
+
     sysdir set PLUS "${git}/ado/"
     sysdir set PERSONAL "${git}/"
 
+  ssc install geoinpoly
+  ssc install cdfplot
+
   net from "https://github.com/bbdaniels/stata/raw/main/"
 
-  copy "https://github.com/graykimbrough/uncluttered-stata-graphs/raw/master/schemes/scheme-uncluttered.scheme" ///
-    "${git}/scheme-uncluttered.scheme" , replace
+	net install vincenty, from("http://fmwww.bc.edu/RePEc/bocode/v")
 
+	qui do "https://raw.githubusercontent.com/bbdaniels/stata/main/src/devkit/zcenter.ado"
+
+  copy "https://github.com/graykimbrough/uncluttered-stata-graphs/raw/master/schemes/scheme-uncluttered.scheme" ///
+    "${git}/ado/scheme-uncluttered.scheme" , replace
+
+  cd "${git}"
   set scheme uncluttered , perm
   graph set eps fontface "Helvetica"
 
